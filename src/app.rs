@@ -95,6 +95,7 @@ impl eframe::App for TemplateApp {
                     add_button(ui, "8", || bits.empty_and_set(8));
                     add_button(ui, "16", || bits.empty_and_set(16));
                     add_button(ui, "32", || bits.empty_and_set(32));
+                    add_button(ui, "64", || bits.empty_and_set(64));
                 });
             });
             ui.separator();
@@ -143,8 +144,9 @@ impl eframe::App for TemplateApp {
                 ui.separator();
             }
 
-            let num = bits_as_num(bits) as isize;
-            let maybe_num = bits_as_num(&maybe_bits) as isize;
+            let num = bits_as_num(bits);
+            let maybe_num = bits_as_num(&maybe_bits);
+            let diff = maybe_num as isize - num as isize;
 
             ui.horizontal(|ui| {
                 add_button(ui, "<<", || bits.shift_left(*new_bit));
@@ -154,7 +156,7 @@ impl eframe::App for TemplateApp {
 
             ui.heading(format!("{num}"));
             if num != maybe_num {
-                ui.heading(format!("maybe {maybe_num} :: diff {}", maybe_num - num));
+                ui.heading(format!("maybe {maybe_num} :: diff {diff}"));
             }
 
             egui::warn_if_debug_build(ui);
