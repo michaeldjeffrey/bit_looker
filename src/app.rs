@@ -146,7 +146,7 @@ impl eframe::App for TemplateApp {
 
             let num = bits_as_num(bits);
             let maybe_num = bits_as_num(&maybe_bits);
-            let diff = maybe_num as isize - num as isize;
+            let diff = maybe_num as i128 - num as i128;
 
             ui.horizontal(|ui| {
                 add_button(ui, "<<", || bits.shift_left(*new_bit));
@@ -284,7 +284,7 @@ impl Bittable for bool {
     }
 }
 
-fn bits_as_num(bits: &[bool]) -> usize {
+fn bits_as_num(bits: &[bool]) -> u128 {
     let mut result = 0;
     for bit in bits.iter() {
         let val = if *bit { 1 } else { 0 };
