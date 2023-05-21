@@ -32,8 +32,8 @@ impl BitHover {
 }
 
 enum BitEvent {
+    Clicked,
     Hovered,
-    ClickDrag,
 }
 
 impl BitLooker {
@@ -62,6 +62,7 @@ impl BitLooker {
         side_panel_area(ui, "Reset", |ui| {
             add_button(ui, "All 0", || bits.empty_and_set_with(bits.len(), false));
             add_button(ui, "All 1", || bits.empty_and_set_with(bits.len(), true));
+            add_button(ui, "Invert", || bits.invert());
         });
     }
 
@@ -71,8 +72,6 @@ impl BitLooker {
             new_bit,
             hovering: clicking,
         } = self;
-
-        ui.heading(format!("Clicking: {clicking:?}"));
 
         let mut maybe_bits = bits.clone();
         let bit_count = bits.len();
@@ -86,10 +85,10 @@ impl BitLooker {
 
                 for (bit, idx) in chunk.iter_mut().zip(range) {
                     add_bit(ui, clicking, idx, *bit, |event| match event {
+                        BitEvent::Clicked => bit.flip(),
                         BitEvent::Hovered => {
                             maybe_bits[bit_count - idx] = !maybe_bits[bit_count - idx]
                         }
-                        BitEvent::ClickDrag => bit.flip(),
                     });
                 }
             });
@@ -97,7 +96,7 @@ impl BitLooker {
             ui.separator();
         }
 
-        let num = bits_as_num(&bits);
+        let num = bits_as_num(bits);
         let maybe_num = bits_as_num(&maybe_bits);
         let diff = maybe_num as i128 - num as i128;
 
@@ -162,21 +161,26 @@ fn add_bit(
 
         let b = ui.add(button);
 
-        if b.hovered() {
+        if b.clicked() {
+            on_event_block(BitEvent::Clicked);
+        } else if b.hovered() {
             on_event_block(BitEvent::Hovered);
-        }
-        // b.clicked() is checked within this block.
-        // Does the button contain the cursor,
-        //   AND is it currently down
-        //   AND have we not been in that state before.
-        ui.ctx().input(|i| {
-            if let Some(pos) = i.pointer.hover_pos() {
-                if b.rect.contains(pos) && i.pointer.any_down() && clicking.hover_has_entered(idx) {
-                    on_event_block(BitEvent::ClickDrag);
-                    clicking.start_hover(idx);
+        } else {
+            // Does the button contain the cursor,
+            //   AND is it currently down
+            //   AND have we not been in that state before.
+            ui.ctx().input(|i| {
+                if let Some(pos) = i.pointer.hover_pos() {
+                    if b.rect.contains(pos)
+                        && i.pointer.any_down()
+                        && clicking.hover_has_entered(idx)
+                    {
+                        on_event_block(BitEvent::Clicked);
+                        clicking.start_hover(idx);
+                    }
                 }
-            }
-        })
+            })
+        }
     });
 }
 
@@ -189,6 +193,7 @@ trait Shiftable {
     fn pop_right(&mut self);
     fn empty_and_set(&mut self, size: usize);
     fn empty_and_set_with(&mut self, size: usize, value: bool);
+    fn invert(&mut self);
 }
 
 impl Shiftable for Vec<bool> {
@@ -198,6 +203,7 @@ impl Shiftable for Vec<bool> {
         self.reverse();
         self.push(new_bit);
     }
+
     fn shift_right(&mut self, new_bit: bool) {
         self.pop();
         self.reverse();
@@ -234,6 +240,10 @@ impl Shiftable for Vec<bool> {
         for _ in 0..size {
             self.push(value);
         }
+    }
+
+    fn invert(&mut self ) {
+        *self = self.iter().map(|x| !x).collect();
     }
 }
 
