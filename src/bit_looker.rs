@@ -107,8 +107,11 @@ impl State {
         });
 
         ui.heading(format!("{num}"));
+        let maybe_text = egui::RichText::new(format!("maybe {maybe_num} :: diff {diff}"));
         if num != maybe_num {
-            ui.heading(format!("maybe {maybe_num} :: diff {diff}"));
+            ui.heading(maybe_text);
+        } else {
+            ui.heading(maybe_text.weak());
         }
     }
 }
