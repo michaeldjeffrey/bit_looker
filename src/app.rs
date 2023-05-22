@@ -73,6 +73,7 @@ impl eframe::App for TemplateApp {
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
             bit_looker.side_panel(ui);
             net_id.side_panel(ui);
+            ui.separator();
             egui::widgets::global_dark_light_mode_buttons(ui);
         });
 
