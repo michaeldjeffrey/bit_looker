@@ -7,6 +7,9 @@ pub struct TemplateApp {
     bit_looker: bit_looker::State,
     net_id: net_id::State,
 
+    show_bit_looker: bool,
+    show_net_id: bool,
+
     styles: MyStyles,
 }
 
@@ -22,6 +25,8 @@ impl Default for TemplateApp {
         Self {
             bit_looker: Default::default(),
             net_id: Default::default(),
+            show_bit_looker: Default::default(),
+            show_net_id: Default::default(),
             styles: MyStyles {
                 button_spc_x: 15.0,
                 button_spc_y: 10.0,
@@ -62,7 +67,9 @@ impl eframe::App for TemplateApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let Self {
             bit_looker,
+            show_bit_looker,
             net_id,
+            show_net_id,
             styles,
         } = self;
 
@@ -70,6 +77,12 @@ impl eframe::App for TemplateApp {
         // Pick whichever suits you.
         // Tip: a good default choice is to just keep the `CentralPanel`.
         // For inspiration and more examples, go to https://emilk.github.io/egui
+        egui::TopBottomPanel::top("apps").show(ctx, |ui| {
+            ui.horizontal(|ui| {
+                ui.toggle_value(show_bit_looker, "Bit Looker");
+                ui.toggle_value(show_net_id, "Net ID");
+            });
+        });
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
             bit_looker.side_panel(ui);
             net_id.side_panel(ui);
@@ -79,17 +92,42 @@ impl eframe::App for TemplateApp {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
+            if *show_bit_looker {
+                ui.style_mut().spacing.button_padding.x = styles.button_spc_x;
+                ui.style_mut().spacing.button_padding.y = styles.button_spc_y;
+                ui.style_mut().override_text_style = Some(egui::TextStyle::Heading);
 
-            ui.style_mut().spacing.button_padding.x = styles.button_spc_x;
-            ui.style_mut().spacing.button_padding.y = styles.button_spc_y;
-            ui.style_mut().override_text_style = Some(egui::TextStyle::Heading);
+                bit_looker.main_view(ui, styles);
+                ui.reset_style();
+                ui.separator();
+            }
 
-            bit_looker.main_view(ui, styles);
-            ui.separator();
-            ui.reset_style();
+            if *show_net_id {
+                net_id.main_view(ui, styles);
+                ui.separator();
+            }
 
-            net_id.main_view(ui, styles);
-            ui.separator();
+            if !*show_bit_looker || !*show_net_id {
+                ui.style_mut().spacing.button_padding.x = styles.button_spc_x;
+                ui.style_mut().spacing.button_padding.y = styles.button_spc_y;
+                ui.style_mut().override_text_style = Some(egui::TextStyle::Heading);
+
+                ui.horizontal(|ui| {
+                    if ui.button("Bit Looker").clicked() {
+                        *show_bit_looker = true;
+                    }
+                    ui.label("Visualize Binary Numbers");
+                });
+
+                ui.horizontal(|ui| {
+                    if ui.button("Net ID").clicked() {
+                        *show_net_id = true;
+                    }
+                    ui.label("Visualize LoRaWAN Net IDs");
+                });
+
+            }
+
             egui::warn_if_debug_build(ui);
         });
     }
