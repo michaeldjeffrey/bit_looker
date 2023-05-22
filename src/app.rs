@@ -4,7 +4,8 @@ use crate::*;
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct TemplateApp {
-    bit_looker: bit_looker::BitLooker,
+    bit_looker: bit_looker::State,
+    net_id: net_id::State,
 
     styles: MyStyles,
 }
@@ -20,6 +21,7 @@ impl Default for TemplateApp {
     fn default() -> Self {
         Self {
             bit_looker: Default::default(),
+            net_id: Default::default(),
             styles: MyStyles {
                 button_spc_x: 15.0,
                 button_spc_y: 10.0,
@@ -58,7 +60,11 @@ impl eframe::App for TemplateApp {
     /// Called each time the UI needs repainting, which may be many times per second.
     /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        let Self { bit_looker, styles } = self;
+        let Self {
+            bit_looker,
+            net_id,
+            styles,
+        } = self;
 
         // Examples of how to create different panels and windows.
         // Pick whichever suits you.
@@ -66,17 +72,23 @@ impl eframe::App for TemplateApp {
         // For inspiration and more examples, go to https://emilk.github.io/egui
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
             bit_looker.side_panel(ui);
+            net_id.side_panel(ui);
             egui::widgets::global_dark_light_mode_buttons(ui);
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
+
             ui.style_mut().spacing.button_padding.x = styles.button_spc_x;
             ui.style_mut().spacing.button_padding.y = styles.button_spc_y;
             ui.style_mut().override_text_style = Some(egui::TextStyle::Heading);
 
             bit_looker.main_view(ui, styles);
+            ui.separator();
+            ui.reset_style();
 
+            net_id.main_view(ui, styles);
+            ui.separator();
             egui::warn_if_debug_build(ui);
         });
     }

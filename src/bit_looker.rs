@@ -2,13 +2,13 @@ use crate::app::MyStyles;
 
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)]
-pub struct BitLooker {
+pub struct State {
     bits: Vec<bool>,
     new_bit: bool,
     hovering: BitHover,
 }
 
-impl Default for BitLooker {
+impl Default for State {
     fn default() -> Self {
         Self {
             bits: vec![false, false, false, false, false, false, false, false],
@@ -36,7 +36,7 @@ enum BitEvent {
     Hovered,
 }
 
-impl BitLooker {
+impl State {
     pub fn side_panel(&mut self, ui: &mut egui::Ui) {
         let Self { bits, .. } = self;
 
@@ -242,7 +242,7 @@ impl Shiftable for Vec<bool> {
         }
     }
 
-    fn invert(&mut self ) {
+    fn invert(&mut self) {
         *self = self.iter().map(|x| !x).collect();
     }
 }

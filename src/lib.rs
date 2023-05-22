@@ -2,4 +2,5 @@
 
 mod app;
 mod bit_looker;
+mod net_id;
 pub use app::TemplateApp;
