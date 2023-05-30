@@ -139,7 +139,7 @@ impl State {
             ui.label("ID:");
             egui::color_picker::color_edit_button_srgba(
                 ui,
-                &mut &mut self.styles.net_id_id,
+                &mut self.styles.net_id_id,
                 egui::color_picker::Alpha::Opaque,
             );
             ui.end_row();
@@ -281,7 +281,7 @@ impl State {
         if let Ok(d) = Devaddr::new(devaddr) {
             ui.horizontal(|ui| {
                 ui.label("Bin:");
-                d.as_bin(ui, &styles);
+                d.as_bin(ui, styles);
             });
 
             egui::Grid::new("devaddr_grid").show(ui, |ui| {
@@ -424,7 +424,7 @@ impl NetID {
     }
 
     fn with_fields(mem_type: u8, id: u32) -> Self {
-        let leading = ((mem_type as u32) << 21) as u32;
+        let leading = ((mem_type as u32) << 21);
         let val = leading | id;
         Self {
             mem_type,
@@ -434,7 +434,7 @@ impl NetID {
     }
 
     fn num(&self) -> u32 {
-        let leading = ((self.mem_type as u32) << 21) as u32;
+        let leading = ((self.mem_type as u32) << 21);
         leading | self.id
     }
 

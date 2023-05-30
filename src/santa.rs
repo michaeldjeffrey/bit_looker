@@ -22,20 +22,11 @@ impl Person {
 
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)]
+#[derive(Default)]
 pub struct State {
     people: Vec<Person>,
     matches: Vec<String>,
     exluding: Option<usize>,
-}
-
-impl Default for State {
-    fn default() -> Self {
-        Self {
-            people: Default::default(),
-            matches: Default::default(),
-            exluding: None,
-        }
-    }
 }
 
 impl State {
@@ -72,15 +63,13 @@ fn disliking_status(excluding: &Option<usize>, people: &[Person], person_idx: us
     if let Some(active_idx) = excluding {
         if active_idx == &person_idx {
             Status::WeAreActive
+        } else if people[*active_idx]
+            .exclude
+            .contains(&people[person_idx].name)
+        {
+            Status::SomeoneElseActiveExcluded
         } else {
-            if people[*active_idx]
-                .exclude
-                .contains(&people[person_idx].name)
-            {
-                Status::SomeoneElseActiveExcluded
-            } else {
-                Status::SomeoneElseActiveIncluded
-            }
+            Status::SomeoneElseActiveIncluded
         }
     } else {
         Status::Inactive
@@ -232,7 +221,7 @@ fn do_make_matches(people: &[Person]) -> Vec<String> {
             Err(e) => eprintln!("attempt {idx}: {e}"),
         }
     }
-    return vec![];
+    vec![]
 }
 
 fn make_matches(people: &[Person]) -> Result<Vec<String>, String> {
@@ -245,7 +234,7 @@ fn make_matches(people: &[Person]) -> Result<Vec<String>, String> {
     }
 
     let mut rng = rand::thread_rng();
-    let mut available_people: Vec<&String> = phone_book.keys().collect();
+    let mut available_people: Vec<String> = phone_book.clone().into_keys().collect();
     let mut starters: Vec<&String> = phone_book.keys().collect();
 
     starters.shuffle(&mut rng);
@@ -255,19 +244,19 @@ fn make_matches(people: &[Person]) -> Result<Vec<String>, String> {
 
     for starter in starters {
         let dislikes = dislikes_map.get(starter).unwrap();
-        let available: Vec<&String> = available_people
+        let available: Vec<String> = available_people
             .clone()
             .into_iter()
-            .filter(|&x| x != starter && !dislikes.contains(x))
+            .filter(|x| x != starter && !dislikes.contains(x))
             .collect();
 
         if available.is_empty() {
             return Err(format!("Unable to find a match for {}", starter));
         }
 
-        let person_b = available.choose(&mut rng).unwrap().clone();
+        let person_b = available.choose(&mut rng).unwrap();
 
-        available_people.retain(|&p| p != person_b);
+        available_people.retain(|p| p != person_b);
         matched.push(format!("{starter}: {person_b}"));
     }
 
