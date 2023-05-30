@@ -6,9 +6,11 @@ use crate::*;
 pub struct TemplateApp {
     bit_looker: bit_looker::State,
     net_id: net_id::State,
+    santa: santa::State,
 
     show_bit_looker: bool,
     show_net_id: bool,
+    show_santa: bool,
 
     styles: MyStyles,
 }
@@ -25,8 +27,10 @@ impl Default for TemplateApp {
         Self {
             bit_looker: Default::default(),
             net_id: Default::default(),
+            santa: Default::default(),
             show_bit_looker: Default::default(),
             show_net_id: Default::default(),
+            show_santa: Default::default(),
             styles: MyStyles {
                 button_spc_x: 15.0,
                 button_spc_y: 10.0,
@@ -70,6 +74,8 @@ impl eframe::App for TemplateApp {
             show_bit_looker,
             net_id,
             show_net_id,
+            santa,
+            show_santa,
             styles,
         } = self;
 
@@ -81,11 +87,18 @@ impl eframe::App for TemplateApp {
             ui.horizontal(|ui| {
                 ui.toggle_value(show_bit_looker, "Bit Looker");
                 ui.toggle_value(show_net_id, "Net ID");
+                ui.toggle_value(show_santa, "Santa");
             });
         });
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
+            ui.heading("SHowing");
+            ui.label(format!("bit_looker: {show_bit_looker}"));
+            ui.label(format!("net_id: {show_net_id}"));
+            ui.label(format!("santa: {show_santa}"));
+
             bit_looker.side_panel(ui);
             net_id.side_panel(ui);
+            santa.side_panel(ui);
             ui.separator();
             egui::widgets::global_dark_light_mode_buttons(ui);
         });
@@ -107,7 +120,12 @@ impl eframe::App for TemplateApp {
                 ui.separator();
             }
 
-            if !*show_bit_looker || !*show_net_id {
+            if *show_santa {
+                santa.main_view(ui, styles);
+                ui.separator();
+            }
+
+            if !(*show_bit_looker || *show_net_id || *show_santa) {
                 ui.style_mut().spacing.button_padding.x = styles.button_spc_x;
                 ui.style_mut().spacing.button_padding.y = styles.button_spc_y;
                 ui.style_mut().override_text_style = Some(egui::TextStyle::Heading);
@@ -126,6 +144,12 @@ impl eframe::App for TemplateApp {
                     ui.label("Visualize LoRaWAN Net IDs");
                 });
 
+                ui.horizontal(|ui| {
+                    if ui.button("Santa").clicked() {
+                        *show_santa = true;
+                    }
+                    ui.label("Secret Santa matcher");
+                });
             }
 
             egui::warn_if_debug_build(ui);

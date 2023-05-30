@@ -3,4 +3,5 @@
 mod app;
 mod bit_looker;
 mod net_id;
+mod santa;
 pub use app::TemplateApp;
