@@ -3,5 +3,6 @@
 mod app;
 mod bit_looker;
 mod net_id;
+mod num_format;
 mod santa;
 pub use app::TemplateApp;

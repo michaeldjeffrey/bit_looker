@@ -1,4 +1,4 @@
-use crate::app::MyStyles;
+use crate::{app::MyStyles, num_format::ToFormattedString};
 
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)]
@@ -98,7 +98,13 @@ impl State {
 
         let num = bits_as_num(bits);
         let maybe_num = bits_as_num(&maybe_bits);
-        let diff = maybe_num as i128 - num as i128;
+        let diff = if maybe_num == 0 {
+            num
+        } else if num > maybe_num {
+            (num as i128 - maybe_num as i128) as u128
+        } else {
+            (maybe_num as i128 - num as i128) as u128
+        };
 
         ui.horizontal(|ui| {
             add_button(ui, "<<", || bits.shift_left(*new_bit));
@@ -106,8 +112,12 @@ impl State {
             add_button(ui, new_bit.clone().bit_display(), || new_bit.flip());
         });
 
-        ui.heading(format!("{num}"));
-        let maybe_text = egui::RichText::new(format!("maybe {maybe_num} :: diff {diff}"));
+        ui.heading(num.to_formatted_string());
+        let maybe_text = egui::RichText::new(format!(
+            "maybe {} :: diff {}",
+            maybe_num.to_formatted_string(),
+            diff.to_formatted_string()
+        ));
         if num != maybe_num {
             ui.heading(maybe_text);
         } else {
@@ -148,7 +158,7 @@ fn add_bit(
         pow -= 1;
 
         ui.label(format!("{idx}"));
-        ui.small(format!("{}", usize::pow(2, pow)));
+        ui.small(usize::pow(2, pow).to_formatted_string());
 
         let button = if bit {
             egui::Button::new(bit.bit_display())

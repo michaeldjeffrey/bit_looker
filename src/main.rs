@@ -24,15 +24,16 @@ fn main() {
     // Redirect tracing to console.log and friends:
     tracing_wasm::set_as_global_default();
 
-    let web_options = eframe::WebOptions::default();
-
     wasm_bindgen_futures::spawn_local(async {
-        eframe::start_web(
-            "the_canvas_id", // hardcode it
-            web_options,
-            Box::new(|cc| Box::new(bit_looker::TemplateApp::new(cc))),
-        )
-        .await
-        .expect("failed to start eframe");
+        let runner = eframe::WebRunner::new();
+        let web_options = eframe::WebOptions::default();
+        runner
+            .start(
+                "the_canvas_id", // hardcode it
+                web_options,
+                Box::new(|cc| Box::new(bit_looker::TemplateApp::new(cc))),
+            )
+            .await
+            .expect("failed to start eframe");
     });
 }

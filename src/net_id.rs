@@ -1,8 +1,5 @@
-#![allow(dead_code, unused)]
-
-use crate::app::MyStyles;
+use crate::{app::MyStyles, num_format::ToFormattedString};
 use egui::Color32;
-use num_format::{SystemLocale, ToFormattedString};
 use std::str::FromStr;
 
 type Result<T, E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
@@ -13,7 +10,6 @@ pub struct State {
     net_id: String,
     devaddr: String,
     #[serde(skip)]
-    locale: SystemLocale,
     styles: Styles,
     common: Vec<CommonNetId>,
     new_name: String,
@@ -79,7 +75,6 @@ impl Default for State {
         Self {
             net_id: Default::default(),
             devaddr: Default::default(),
-            locale: SystemLocale::default().unwrap(),
             styles: Default::default(),
             common: vec![
                 CommonNetId::new("Helium", "00003C"),
@@ -185,7 +180,6 @@ impl State {
         let Self {
             net_id,
             devaddr,
-            locale,
             styles,
             ..
         } = self;
@@ -254,7 +248,7 @@ impl State {
                 let size = end.addr - start.addr + 1;
 
                 ui.label("Size:");
-                ui.label(size.to_formatted_string(locale));
+                ui.label(size.to_formatted_string());
                 ui.label(format!("{} bits", addr_offset_for_mem_type(n.mem_type)));
                 ui.end_row();
                 // ======================
@@ -314,8 +308,8 @@ impl State {
                 ui.label("Addr:");
                 ui.label(format!(
                     "{} of {}",
-                    (d.addr + 1).to_formatted_string(locale),
-                    size.to_formatted_string(locale)
+                    (d.addr + 1).to_formatted_string(),
+                    size.to_formatted_string()
                 ));
                 ui.label(format!("{}%", per));
                 ui.end_row();
@@ -394,14 +388,6 @@ impl Devaddr {
         mem_type_bits | nwk_id_bits | addr_bits
     }
 
-    fn net_id_type(&self) -> u8 {
-        self.mem_type
-    }
-
-    fn nwk_id(&self) -> u32 {
-        self.nwk_addr
-    }
-
     fn net_id(&self) -> NetID {
         NetID::with_fields(self.mem_type, self.nwk_addr)
     }
@@ -424,7 +410,7 @@ impl NetID {
     }
 
     fn with_fields(mem_type: u8, id: u32) -> Self {
-        let leading = ((mem_type as u32) << 21);
+        let leading = (mem_type as u32) << 21;
         let val = leading | id;
         Self {
             mem_type,
@@ -434,7 +420,7 @@ impl NetID {
     }
 
     fn num(&self) -> u32 {
-        let leading = ((self.mem_type as u32) << 21);
+        let leading = (self.mem_type as u32) << 21;
         leading | self.id
     }
 
@@ -504,10 +490,6 @@ impl Printable for Devaddr {
 
     fn as_bin(&self, ui: &mut egui::Ui, styles: &Styles) {
         ui.horizontal(|ui| {
-            use std::fmt::Write;
-
-            let mut output = String::new();
-
             let type_bit = (self.mem_type + 1) as usize;
             let nwk_bit = nwk_id_offset_for_mem_type(self.mem_type) + type_bit;
 
@@ -524,7 +506,6 @@ impl Printable for Devaddr {
 
                 if idx != 0 && (idx + 1) % 8 == 0 && idx != 31 {
                     ui.label(" | ");
-                    // write!(output, " | ").unwrap();
                 }
             }
         });

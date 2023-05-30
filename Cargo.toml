@@ -18,9 +18,11 @@ egui_extras = "0.22.0"
 
 # You only need serde if you want app persistence:
 serde = { version = "1", features = ["derive"] }
-num-format = { version = "0.4.4", features = ["with-system-locale"] }
-rand = "0.8.4"
+rand = "0.8.5"
+# getrandom is a dep of rand, but we need to enable the js feature for wasm-unknown-unknown
+getrandom = { version = "0.2", features = ["js"] }
 egui_node_graph = "0.4.0"
+formato = "0.2.0"
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

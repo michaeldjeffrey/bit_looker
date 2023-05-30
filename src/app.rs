@@ -96,9 +96,15 @@ impl eframe::App for TemplateApp {
             ui.label(format!("net_id: {show_net_id}"));
             ui.label(format!("santa: {show_santa}"));
 
-            bit_looker.side_panel(ui);
-            net_id.side_panel(ui);
-            santa.side_panel(ui);
+            if *show_bit_looker {
+                bit_looker.side_panel(ui);
+            }
+            if *show_net_id {
+                net_id.side_panel(ui);
+            }
+            if *show_santa {
+                santa.side_panel(ui);
+            }
             ui.separator();
             egui::widgets::global_dark_light_mode_buttons(ui);
         });
