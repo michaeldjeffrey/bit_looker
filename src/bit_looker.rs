@@ -73,13 +73,14 @@ impl State {
             hovering: clicking,
         } = self;
 
-        let mut maybe_bits = bits.clone();
+        let mut maybe_bit: Option<i128> = None;
         let bit_count = bits.len();
         let chunk_count = bit_count / 8;
 
         for (chunk_idx, chunk) in bits.chunks_mut(8).enumerate() {
             ui.horizontal(|ui| {
-                let end = (chunk_count - chunk_idx) * 8;
+                // Fix OBO offset with -1.
+                let end = (chunk_count - chunk_idx) * 8 - 1;
                 let start = end - 7;
                 let range = (start..=end).rev();
 
@@ -87,7 +88,11 @@ impl State {
                     add_bit(ui, clicking, idx, *bit, |event| match event {
                         BitEvent::Clicked => bit.flip(),
                         BitEvent::Hovered => {
-                            maybe_bits[bit_count - idx] = !maybe_bits[bit_count - idx]
+                            if *bit {
+                                maybe_bit = Some(0 - index_pow(idx) as i128);
+                            } else {
+                                maybe_bit = Some(index_pow(idx) as i128);
+                            }
                         }
                     });
                 }
@@ -96,21 +101,15 @@ impl State {
             ui.separator();
         }
 
-        let num = bits_as_num(bits);
-        let maybe_num = bits_as_num(&maybe_bits);
-        let diff = if maybe_num == 0 {
-            num
-        } else if num > maybe_num {
-            (num as i128 - maybe_num as i128) as u128
-        } else {
-            (maybe_num as i128 - num as i128) as u128
-        };
-
         ui.horizontal(|ui| {
             add_button(ui, "<<", || bits.shift_left(*new_bit));
             add_button(ui, ">>", || bits.shift_right(*new_bit));
             add_button(ui, new_bit.clone().bit_display(), || new_bit.flip());
         });
+
+        let num = bits_as_num(bits);
+        let diff: i128 = maybe_bit.unwrap_or_default();
+        let maybe_num = num as i128 + diff;
 
         ui.heading(num.to_formatted_string());
         let maybe_text = egui::RichText::new(format!(
@@ -118,11 +117,7 @@ impl State {
             maybe_num.to_formatted_string(),
             diff.to_formatted_string()
         ));
-        if num != maybe_num {
-            ui.heading(maybe_text);
-        } else {
-            ui.heading(maybe_text.weak());
-        }
+        ui.heading(maybe_text.weak());
     }
 }
 
@@ -153,12 +148,8 @@ fn add_bit(
 ) {
     let rounding = 8.0;
     ui.vertical(|ui| {
-        // get the position power from 1-index
-        let mut pow = idx.try_into().unwrap();
-        pow -= 1;
-
         ui.label(format!("{idx}"));
-        ui.small(usize::pow(2, pow).to_formatted_string());
+        ui.small(index_pow(idx).to_formatted_string());
 
         let button = if bit {
             egui::Button::new(bit.bit_display())
@@ -195,6 +186,11 @@ fn add_bit(
             })
         }
     });
+}
+
+// 2^0 = 1, 2^1 = 2, 2^2 = 4
+fn index_pow(idx: usize) -> u64 {
+    u64::pow(2, idx as u32)
 }
 
 trait Shiftable {
