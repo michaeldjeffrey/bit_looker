@@ -89,13 +89,6 @@ impl Default for State {
 }
 
 impl State {
-    fn new_common_net_id(&mut self) -> CommonNetId {
-        let new = CommonNetId::new(&self.new_name, &self.new_net_id);
-        self.new_name = Default::default();
-        self.new_net_id = Default::default();
-        new
-    }
-
     pub fn side_panel(&mut self, ui: &mut egui::Ui) {
         ui.heading("Common Net ID");
 
@@ -106,18 +99,6 @@ impl State {
                     self.net_id = common.net_id.clone();
                 }
             });
-        }
-        ui.horizontal(|ui| {
-            ui.label("Name:");
-            ui.text_edit_singleline(&mut self.new_name);
-        });
-        ui.horizontal(|ui| {
-            ui.label("NetID:");
-            ui.text_edit_singleline(&mut self.new_net_id);
-        });
-        if ui.button("Add Common").clicked() {
-            let new = self.new_common_net_id();
-            self.common.push(new);
         }
         ui.separator();
 
@@ -250,6 +231,14 @@ impl State {
                 ui.label("Size:");
                 ui.label(size.to_formatted_string());
                 ui.label(format!("{} bits", addr_offset_for_mem_type(n.mem_type)));
+                ui.end_row();
+                // ======================
+                ui.label("Subnet:");
+                ui.label(format!(
+                    "{}/{}",
+                    start.as_hex(),
+                    32 - addr_offset_for_mem_type(n.mem_type)
+                ));
                 ui.end_row();
                 // ======================
                 ui.label("Range");
