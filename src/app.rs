@@ -5,6 +5,7 @@ use crate::*;
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct App {
     net_id: net_id::State,
+    roaming_token: roaming_token::State,
     styles: MyStyles,
 }
 
@@ -19,6 +20,7 @@ impl Default for App {
     fn default() -> Self {
         Self {
             net_id: Default::default(),
+            roaming_token: Default::default(),
             styles: MyStyles {
                 button_spc_x: 15.0,
                 button_spc_y: 10.0,
@@ -57,7 +59,11 @@ impl eframe::App for App {
     /// Called each time the UI needs repainting, which may be many times per second.
     /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        let Self { net_id, styles } = self;
+        let Self {
+            net_id,
+            roaming_token,
+            styles,
+        } = self;
 
         // Examples of how to create different panels and windows.
         // Pick whichever suits you.
@@ -66,12 +72,16 @@ impl eframe::App for App {
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
             net_id.side_panel(ui);
             ui.separator();
+            roaming_token.side_panel(ui);
+            ui.separator();
             egui::widgets::global_dark_light_mode_buttons(ui);
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
             net_id.main_view(ui, styles);
+            ui.separator();
+            roaming_token.main_view(ui);
             egui::warn_if_debug_build(ui);
         });
     }
