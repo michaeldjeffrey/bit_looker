@@ -11,7 +11,7 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "Bit Looker",
         native_options,
-        Box::new(|cc| Box::new(bit_looker::TemplateApp::new(cc))),
+        Box::new(|cc| Box::new(bit_looker::App::new(cc))),
     )
 }
 
@@ -31,7 +31,7 @@ fn main() {
             .start(
                 "the_canvas_id", // hardcode it
                 web_options,
-                Box::new(|cc| Box::new(bit_looker::TemplateApp::new(cc))),
+                Box::new(|cc| Box::new(bit_looker::App::new(cc))),
             )
             .await
             .expect("failed to start eframe");

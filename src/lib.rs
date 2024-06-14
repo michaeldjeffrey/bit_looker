@@ -5,4 +5,4 @@ mod app;
 mod net_id;
 mod num_format;
 // mod santa;
-pub use app::TemplateApp;
+pub use app::App;
