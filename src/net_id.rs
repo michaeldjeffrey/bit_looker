@@ -96,7 +96,7 @@ impl State {
             ui.horizontal(|ui| {
                 ui.label(&common.name);
                 if ui.button(&common.net_id).clicked() {
-                    self.net_id = common.net_id.clone();
+                    self.net_id.clone_from(&common.net_id);
                 }
             });
         }
@@ -520,7 +520,7 @@ impl Printable for NetID {
 
             let mut output = String::new();
             let rfu_bits = match self.mem_type {
-                0 | 1 | 2 => 15 + 3, // include type bits
+                0..=2 => 15 + 3, // include type bits
                 _ => 0,
             };
 

@@ -88,7 +88,7 @@ fn parse_token(input: &str) -> Option<Token> {
 
     let packet_time_bytes = caps.name("packet_time")?.as_bytes();
     let packet_time_str = String::from_utf8(packet_time_bytes.to_vec()).ok()?;
-    let packet_time = u64::from_str_radix(&packet_time_str, 10).ok()?;
+    let packet_time = packet_time_str.parse::<u64>().ok()?;
 
     let route_id_bytes = caps.name("route_id")?.as_bytes();
     let route_id = String::from_utf8(route_id_bytes.to_vec()).ok()?;
@@ -98,7 +98,7 @@ fn parse_token(input: &str) -> Option<Token> {
     let pubkey_bytes = &decoded[pubkey_cap.start()..];
     // Taken from helium-crypto PubkeyBinary Display trait
     let mut pubkey = vec![0u8; pubkey_bytes.len() + 1];
-    pubkey[1..].copy_from_slice(&pubkey_bytes);
+    pubkey[1..].copy_from_slice(pubkey_bytes);
     let b58 = bs58::encode(&pubkey).with_check().into_string();
 
     let animal_name = b58
