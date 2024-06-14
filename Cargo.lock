@@ -433,12 +433,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
 
 [[package]]
-name = "atomic_refcell"
-version = "0.1.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41e67cd8309bbd06cd603a9e693a784ac2e5d1e955f11286e355089fcab3047c"
-
-[[package]]
 name = "atspi"
 version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -505,11 +499,9 @@ dependencies = [
  "angry-purple-tiger",
  "bs58",
  "chrono",
- "console_error_panic_hook",
  "eframe",
- "egui 0.27.2",
+ "egui",
  "egui_extras",
- "egui_node_graph",
  "formato",
  "getrandom",
  "hex",
@@ -519,7 +511,6 @@ dependencies = [
  "serde",
  "timeago",
  "tracing-subscriber",
- "tracing-wasm",
  "wasm-bindgen-futures",
 ]
 
@@ -850,16 +841,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "console_error_panic_hook"
-version = "0.1.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a06aeb73f470f66dcdbf7223caeebb85984942f22f1adb2a088cf9668146bbbc"
-dependencies = [
- "cfg-if",
- "wasm-bindgen",
-]
-
-[[package]]
 name = "core-foundation"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1042,7 +1023,7 @@ dependencies = [
  "cocoa",
  "directories-next",
  "document-features",
- "egui 0.27.2",
+ "egui",
  "egui-winit",
  "egui_glow",
  "glow",
@@ -1070,24 +1051,13 @@ dependencies = [
 
 [[package]]
 name = "egui"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc9fcd393c3daaaf5909008a1d948319d538b79c51871e4df0993260260a94e4"
-dependencies = [
- "ahash",
- "epaint 0.19.0",
- "nohash-hasher",
-]
-
-[[package]]
-name = "egui"
 version = "0.27.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "584c5d1bf9a67b25778a3323af222dbe1a1feb532190e103901187f92c7fe29a"
 dependencies = [
  "accesskit",
  "ahash",
- "epaint 0.27.2",
+ "epaint",
  "log",
  "nohash-hasher",
  "ron",
@@ -1102,7 +1072,7 @@ checksum = "2e3da0cbe020f341450c599b35b92de4af7b00abde85624fd16f09c885573609"
 dependencies = [
  "accesskit_winit",
  "arboard",
- "egui 0.27.2",
+ "egui",
  "log",
  "raw-window-handle 0.6.2",
  "serde",
@@ -1118,7 +1088,7 @@ version = "0.27.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b78779f35ded1a853786c9ce0b43fe1053e10a21ea3b23ebea411805ce41593"
 dependencies = [
- "egui 0.27.2",
+ "egui",
  "enum-map",
  "log",
  "mime_guess2",
@@ -1132,31 +1102,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0e5d975f3c86edc3d35b1db88bb27c15dde7c55d3b5af164968ab5ede3f44ca"
 dependencies = [
  "bytemuck",
- "egui 0.27.2",
+ "egui",
  "glow",
  "log",
  "memoffset 0.9.1",
  "wasm-bindgen",
  "web-sys",
 ]
-
-[[package]]
-name = "egui_node_graph"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d0759e8cf3b27a5787137636e26d8b59c4ec9842e13ff15616c5b776c2559a71"
-dependencies = [
- "egui 0.19.0",
- "slotmap",
- "smallvec",
- "thiserror",
-]
-
-[[package]]
-name = "emath"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9542a40106fdba943a055f418d1746a050e1a903a049b030c2b097d4686a33cf"
 
 [[package]]
 name = "emath"
@@ -1223,20 +1175,6 @@ dependencies = [
 
 [[package]]
 name = "epaint"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ba04741be7f6602b1a1b28f1082cce45948a7032961c52814f8946b28493300"
-dependencies = [
- "ab_glyph",
- "ahash",
- "atomic_refcell",
- "emath 0.19.0",
- "nohash-hasher",
- "parking_lot",
-]
-
-[[package]]
-name = "epaint"
 version = "0.27.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b381f8b149657a4acf837095351839f32cd5c4aec1817fc4df84e18d76334176"
@@ -1245,7 +1183,7 @@ dependencies = [
  "ahash",
  "bytemuck",
  "ecolor",
- "emath 0.27.2",
+ "emath",
  "log",
  "nohash-hasher",
  "parking_lot",
@@ -3046,17 +2984,6 @@ dependencies = [
  "thread_local",
  "tracing-core",
  "tracing-log",
-]
-
-[[package]]
-name = "tracing-wasm"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4575c663a174420fa2d78f4108ff68f65bf2fbb7dd89f33749b6e826b3626e07"
-dependencies = [
- "tracing",
- "tracing-subscriber",
- "wasm-bindgen",
 ]
 
 [[package]]
